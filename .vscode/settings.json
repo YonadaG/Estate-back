@@ -1,0 +1,6 @@
+{
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 150,
+    "editor.wordWrap": "on",
+    "rubyLsp.formatter": "rubocop_internal"
+}
