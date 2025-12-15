@@ -15,11 +15,25 @@ class PropertiesController < ApplicationController
       @properties = @properties.by_price_range(min_price, max_price)
     end
 
-    render json: @properties
+    properties_json = @properties.map do |property|
+      property.as_json(include: {
+        user: {},
+        images: {
+          methods: [ :url, :filename, :content_type, :byte_size ]
+        }
+      }).merge(favorited: current_user ? property.favorited_by?(current_user) : false)
+    end
+
+    render json: properties_json
   end
 
   def show
-    render json: @property, include: [ :user, :images ]
+    render json: @property.as_json(include: {
+      user: {},
+      images: {
+        methods: [ :url, :filename, :content_type, :byte_size ]
+      }
+    }).merge(favorited: current_user ? @property.favorited_by?(current_user) : false)
   end
 
   def create
@@ -31,9 +45,12 @@ class PropertiesController < ApplicationController
     @property = current_user.properties.build(property_params)
 
     if @property.save
-      render json: { property_title: @property.title, photo_url: [
-        @property.photos.map { |photo| url_for(photo) }
-      ]}, status: :created
+      render json: @property.as_json(include: {
+        user: {},
+        images: {
+          methods: [ :url, :filename, :content_type, :byte_size ]
+        }
+      }), status: :created
     else
       render json: { errors: @property.errors.full_messages }, status: :unprocessable_entity
     end
@@ -45,12 +62,11 @@ class PropertiesController < ApplicationController
       end
 
       if @property.update(property_params)
-        # Handle new image uploads
         render json: @property.as_json(include: {
           images: {
             methods: [ :url, :filename, :content_type, :byte_size ]
           }
-        })
+        }).merge(favorited: current_user ? @property.favorited_by?(current_user) : false)
       else
         render json: { errors: @property.errors.full_messages }, status: :unprocessable_entity
       end
@@ -75,6 +91,7 @@ class PropertiesController < ApplicationController
     params.require(:property).permit(
       :title, :description, :price, :property_type,
       :location, :bedrooms, :area, :status, :bathrooms, :floor_number,
+      :latitude, :longitude,
       additional_information: {},
       photos: []
     )

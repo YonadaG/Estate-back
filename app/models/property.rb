@@ -28,6 +28,10 @@ class Property < ApplicationRecord
     user_id == user.id
   end
 
+  def can_be_edited_by?(user)
+    user_id == user.id
+  end
+
   def favorited_by?(user)
     favorites.exists?(user_id: user.id)
   end

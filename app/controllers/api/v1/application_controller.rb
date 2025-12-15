@@ -19,6 +19,8 @@ class ApplicationController < ActionController::API
 
   # Require user to be logged in for certain actions
   def require_login
+    puts "DEBUG: Checking login. session[:user_id] = #{session[:user_id]}, current_user = #{current_user.inspect}"
+    puts "DEBUG: Session data: #{session.inspect}"
     unless logged_in?
       render json: { error: "Please log in" }, status: :unauthorized
     end

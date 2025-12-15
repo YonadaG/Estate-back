@@ -25,12 +25,10 @@ module EstateBack
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-
-    # Enable sessions
-
-    config.session_store :cookie_store, key: "estate_back_session"
-    config.middleware.use ActionDispatch::Session::CookieStore
+    # Enable sessions with CORS-friendly settings
+    config.session_store :cookie_store, key: "_estate_back_session", same_site: :lax, secure: false
     config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore, key: "_estate_back_session", same_site: :lax, secure: false
 
 
   end

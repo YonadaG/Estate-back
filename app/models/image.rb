@@ -4,7 +4,7 @@ class Image < ApplicationRecord
 
 
    has_one_attached :file
-   validates :image_url, presence: true
+   validates :image_url, presence: true, unless: -> { file.attached? }
    validates :file, presence: true, unless: -> { image_url.present? }
    before_validation :set_uploaded_by, on: :create
     def url
